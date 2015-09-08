@@ -1,26 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.AspNet.Mvc;
+using UrlShorteningService.Services;
 
 namespace UrlShorteningService.Controllers
 {
     [Route("")]
     public class RedirectionController : Controller
     {
-        private readonly IDictionary<string, string> _redirects = new Dictionary<string, string>(StringComparer.Ordinal)
+        private readonly IRepository _repository;
+
+        public RedirectionController(IRepository repository)
         {
-            { "google", "http://www.google.com" },
-            { "20", "http://www.20min.ch" }
-        };
+            _repository = repository;
+        }
 
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            string url;
+            var entry = _repository.Get(id);
+            var link = entry as LinkEntry;
 
-            if (_redirects.TryGetValue(id, out url))
+            if (link != null)
             {
-                return new RedirectResult(url, permanent: false);
+                return new RedirectResult(link.Link, permanent: false);
             }
 
             Context.Response.StatusCode = 404;
@@ -32,6 +35,68 @@ namespace UrlShorteningService.Controllers
         {
             return View("Index");
         }
+
+        [HttpPost("")]
+        public IActionResult Create(string url, string link)
+        {
+            Uri uri;
+            if (!Uri.TryCreate(link, UriKind.Absolute, out uri))
+            {
+                Context.Response.StatusCode = 500;
+                return View("500");
+            }
+
+            if (string.IsNullOrEmpty(url))
+            {
+                url = Guid.NewGuid().ToString("n");
+            }
+
+            _repository.Add(new LinkEntry { Id = url, Link = uri.ToString() });
+
+            return Redirect("/r/" + url);
+        }
+    }
+
+    [Route("r")]
+    public class ResultController : Controller
+    {
+        private readonly IRepository _repository;
+
+        public ResultController(IRepository repository)
+        {
+            _repository = repository;
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult Result(string id)
+        {
+            var entry = _repository.Get(id);
+            var link = entry as LinkEntry;
+
+            if (link != null)
+            {
+                var url = Uri.EscapeDataString("http://307.ch/" + id);
+                var qr = string.Format("https://api.qrserver.com/v1/create-qr-code/?data={0}&size=200x200", url);
+
+                var dto = new ResultDto
+                {
+                    Id = link.Id,
+                    Link = link.Link,
+                    Qr = qr
+                };
+                return View("Result", dto);
+            }
+
+            Context.Response.StatusCode = 404;
+            return View("404");
+        }
+    }
+
+    public class ResultDto
+    {
+        public string Id { get; set; }
+        public string Link { get; set; }
+        public string Qr { get; set; }
     }
 
     [Route("api/v1/[controller]")]

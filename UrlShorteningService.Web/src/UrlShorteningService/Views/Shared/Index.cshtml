@@ -14,9 +14,10 @@
                 <h1 class="title">307.ch</h1>
                 <h3 class="subtitle">Free URL shortening service</h3>
 
-                <form role="form">
+                <form role="form" action="" method="POST">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Paste link here">
+                        <input type="hidden" name="url" value="" />
+                        <input type="text" name="link" class="form-control" placeholder="Paste link here">
                         <span class="input-group-btn">
                             <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-link"></span></button>
                         </span>
