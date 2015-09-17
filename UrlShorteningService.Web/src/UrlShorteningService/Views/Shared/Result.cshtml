@@ -1,5 +1,5 @@
 ﻿@using UrlShorteningService.Controllers
-@model ResultDto
+@model ResultController.ResultDto
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,13 +14,12 @@
         <div class="row">
             <div class="col-md-8 col-lg-8 col-md-offset-2 col-lg-offset-2 text-center">
                 <h1 class="title">Resultat</h1>
-                <h3 class="subtitle">Zeige Url und Barcode (später auch statistik).</h3>
-
+                <h3 class="subtitle">
+                    <a href="/@Model.Id">@Model.Url</a>
+                </h3>
                 <p>
-                    ID: @Model.Id <br/>
-                    Link: @Model.Link
+                    <img src="@Model.Qr" />
                 </p>
-                <img src="@Model.Qr" />
             </div>
         </div>
 

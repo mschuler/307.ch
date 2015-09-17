@@ -17,6 +17,8 @@ namespace UrlShorteningService
             services.AddMvc();
 
             services.AddSingleton<IRepository, Repository>();
+            services.AddSingleton<IBase58Converter, Base58Converter>();
+            services.AddSingleton<IIdGenerator, IdGenerator>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
