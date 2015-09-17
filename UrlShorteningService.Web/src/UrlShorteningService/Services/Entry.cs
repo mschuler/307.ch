@@ -12,5 +12,6 @@
     public abstract class Entry
     {
         public string Id { get; set; }
+        public string AdminCode { get; set; }
     }
 }

@@ -10,12 +10,14 @@ namespace UrlShorteningService.Controllers
         private readonly IRepository _repository;
         private readonly IIdGenerator _idGenerator;
         private readonly IBase58Converter _base58Converter;
+        private readonly IAdminCodeGenerator _adminCodeGenerator;
 
-        public RedirectionController(IRepository repository, IIdGenerator idGenerator, IBase58Converter base58Converter)
+        public RedirectionController(IRepository repository, IIdGenerator idGenerator, IBase58Converter base58Converter, IAdminCodeGenerator adminCodeGenerator)
         {
             _repository = repository;
             _idGenerator = idGenerator;
             _base58Converter = base58Converter;
+            _adminCodeGenerator = adminCodeGenerator;
         }
 
         [HttpGet("{id}")]
@@ -55,7 +57,12 @@ namespace UrlShorteningService.Controllers
                 url = _base58Converter.ToString(id);
             }
 
-            _repository.Add(new LinkEntry { Id = url, Link = uri.ToString() });
+            _repository.Add(new LinkEntry
+            {
+                Id = url,
+                AdminCode = _adminCodeGenerator.Generate(),
+                Link = uri.ToString()
+            });
 
             return Redirect("/r/" + url);
         }

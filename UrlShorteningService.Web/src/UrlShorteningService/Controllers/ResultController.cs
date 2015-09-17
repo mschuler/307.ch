@@ -31,6 +31,7 @@ namespace UrlShorteningService.Controllers
                     Id = link.Id,
                     Url = url,
                     Link = link.Link,
+                    AdminCode = link.AdminCode,
                     Qr = qr
                 };
                 return View("Result", dto);
@@ -45,6 +46,7 @@ namespace UrlShorteningService.Controllers
             public string Id { get; set; }
             public string Url { get; set; }
             public string Link { get; set; }
+            public string AdminCode { get; set; }
             public string Qr { get; set; }
         }
     }
